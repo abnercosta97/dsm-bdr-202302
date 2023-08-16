@@ -22,4 +22,4 @@ alter table agencia rename to tbl_agencia;
 alter table tbl_cliente add column idade integer;
 alter table tbl_cliente add column cpf integer;
 alter table tbl_agencia rename column cidade_agencia to endereco_agencia;
-create schema rodrigo;
+create schema abner;
