@@ -16,7 +16,7 @@ create table tbl_livros(codigo_livro INTEGER PRIMARY KEY, codigo_titulo FOREIGN 
 
 create database bd_aula03;
 
-/*\c bd_aula03;*/
+\c bd_aula03
 
 create table tbl_cliente(codigo_cliente INTEGER PRIMARY KEY, Nome NOTNULL, Cidade text, Endereco text);
 
@@ -26,4 +26,3 @@ create table tbl_emprestimo(numero_emprestimo integer PRIMARY KEY, FOREIGN KEY(c
 
 create table tbl_livros(codigo_livro integer PRIMARY KEY, codigo_titulo FOREIGN KEY);*/
 
---tes
