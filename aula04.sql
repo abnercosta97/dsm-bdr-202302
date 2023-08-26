@@ -50,3 +50,16 @@ select * from tbl_titulo;
 --Copie todos dos códigos da tbl_cliente para essa nova tabela usando o SQL Insert.
 CREATE table tbl_cliente2 (codigo integer);
 insert into tbl_cliente2 select codigo_cliente from tbl_cliente;
+-- Atualizar todos livros alugados para disponivel
+select * --VISUALIZAR PRIMEIRO
+from tbl_livros;
+update tbl_livros
+set status = 'DISPONIVEL'
+where status = 'ALUGADO';
+--Delete todos as linhas da tabela tbl_cliente2 onde o código for maior que 3
+--visualizar primeiro
+select *
+from tbl_cliente2
+where codigo > 3;
+delete from tbl_cliente2
+where codigo > 3;
