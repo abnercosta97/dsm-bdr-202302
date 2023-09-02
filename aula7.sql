@@ -23,9 +23,15 @@ from tbl_fornecedor as f
 join tbl_peca as p on f.cidade = p.cidade
 order by f.nome , p.nome;
 --listar as cidades onde existem fornecedores (sem valores duplicados)
-
+select distinct(cidade)
+from tbl_fornecedor;
 --Listar o nome e a cor das peças do fornecedor com código 3, ordenado pelo nome da peça
-
+select p.nome, p.cor
+from tbl_fornecedor as f
+join tbl_estoque as e on f.cod_fornecedor = e.cod_fornecedor
+join tbl_peca as p on e.cod_peca = p.cod_peca
+where f.cod_fornecedor = 3
+order by p.nome;
 --Listar o nome e a cidade dos fornecedores com mais de 10 peças.Contar só as peças de código 1. 
 
 --Listar a quantidade total de peças com código 1, fornecidas pelos fornecedores.
