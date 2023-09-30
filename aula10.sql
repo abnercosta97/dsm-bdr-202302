@@ -176,29 +176,60 @@ INSERT INTO tbl_empregados (nome, data_nascimento, endereco, sexo, salario, cod_
 ('Gustavo Gomes', '1986-09-25', 'Rua das Montanhas, 5432, Belo Horizonte, MG', 'M', 5700.00, 36),
 ('Lúcia Castro', '1990-05-19', 'Avenida das Árvores, 7890, Curitiba, PR', 'F', 5600.00, 36);
 
+--Liste os nomes das peças e a soma das suas respectivas quantidades
 
+select p.nome, sum(e.quantidade)
+from tbl_estoque e
+inner join tbl_peca p on (e.cod_peca=p.cod_peca)
+group by p.nome;
+
+--Liste os nomes das peças e a soma das suas respectivas quantidades, caso a soma das peças seja maior que 20
+
+select p.nome, sum(e.quantidade)
+from tbl_estoque e
+inner join tbl_peca p on (e.cod_peca=p.cod_peca)
+group by p.nome
+having sum(e.quantidade)>20;
 
 -- exercicios
 
+--1. Criar uma view chamada v_depcidade que liste o nome de cada departamento com o nome da cidade onde este departamento está localizado.
+CREATE OR REPLACE VIEW v_depcidade AS
+SELECT d.nome AS departamento, c.nome AS cidade
+FROM tbl_departamentos d
+INNER JOIN tbl_cidades c ON d.cod_cidade = c.cod_cidade;
 
---1 crie uma view chamada v_depcidade que liste o nome de cada departamento com o nome da cidade onde este departamento está localizado.
---Após a criacao executar Select * from v_depcidade; retorna 36 linhas
+--2. Criar uma view denominada v_depcidadehouston, a partir de v_depcidade, que mostre somente os departamentos localizados em Houston.
+CREATE OR REPLACE VIEW v_depcidadehouston AS
+SELECT departamento, cidade
+FROM v_depcidade
+WHERE cidade = 'Houston';
 
+--3. Criar uma visão denominada v_opsalario, a qual lista a soma e média de todos os salários dos empregados.
+CREATE OR REPLACE VIEW v_opsalario AS
+SELECT SUM(salario) AS soma_salarios, AVG(salario) AS media_salarios
+FROM tbl_empregados;
 
---2 crie uma view denominada v_depcidadehouston, a partir de v_depcidade que mostre somente os departamentos localizados em Houston
--- execute select * from v_depcidadehouston
+--4. Criar a view vw_empregados_salarial que exibe o nome e o salário de todos os empregados com salário acima de 5500.
+CREATE OR REPLACE VIEW vw_empregados_salarial AS
+SELECT nome, salario
+FROM tbl_empregados
+WHERE salario > 5500.00;
 
+--5. Criar uma view v_departemp para listar os departamentos e a quantidade de empregados em cada um,
+-- listar os departamentos e as quantidades por ordem decrescente de quantidade.
+CREATE OR REPLACE VIEW v_departemp AS
+SELECT d.nome AS departamento, COUNT(e.cod_empregado) AS quantidade_empregados
+FROM tbl_departamentos d
+LEFT JOIN tbl_empregados e ON d.cod_departamento = e.cod_departamento
+GROUP BY d.nome
+ORDER BY quantidade_empregados DESC;
 
---3 Crie uma visão denominada de v_opsalario, a qual lista a soma e média de todos os salários dos empregados.
--- execute select * from v_opsalario
-
-
---4 Criar a view vw_empregados_salarial que exibe o nome e o salário de todos os empregados com salário acima de 5500.
--- execute select * from v_empregados_salarial
-
-
---5 criar uma view v_departemp para listar os departamentos e a quantidade de empregados em cada um
--- listar os departamentos e as quantidades por orderm decrescente de quantidade.
-
-
---6 criar uma view v_departrouble para listar os nomes dos departamentos que possuem mais projetos do que empregados.
+--6. Criar uma view v_departrouble para listar os nomes dos departamentos que possuem mais projetos do que empregados.
+CREATE OR REPLACE VIEW v_departrouble AS
+SELECT d.nome AS departamento
+FROM tbl_departamentos d
+INNER JOIN tbl_projetos p ON d.cod_departamento = p.cod_departamento
+LEFT JOIN tbl_empregados e ON d.cod_departamento = e.cod_departamento
+GROUP BY d.nome
+HAVING COUNT(DISTINCT p.cod_projeto) > COUNT(DISTINCT e.cod_empregado);
