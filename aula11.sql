@@ -183,82 +183,57 @@ INSERT INTO tbl_empregados (nome, data_nascimento, endereco, sexo, salario, cod_
 
 --1 crie uma store procedure chamada proc_upd_nome_depart para atualizar o nome de um departamento. 
 --recebe como parametro um codigo inteiro e um novonome em texto atualizando o nome do departamento com esse respectivo codigo
-CREATE OR REPLACE PROCEDURE proc_upd_nome_depart(
-    IN p_cod_departamento INT,
-    IN p_novonome TEXT
-)
-LANGUAGE SQL
-AS
-$$
-UPDATE tbl_departamentos
-SET nome = p_novonome
-WHERE cod_departamento = p_cod_departamento;
-$$;
+
+CREATE PROCEDURE proc_upddepart (codigo int, novonome text) 
+language plpgsql AS $$
+BEGIN
+	UPDATE tbl_departamentos SET nome=novonome where cod_departamento=codigo;
+	COMMIT;
+END $$;
 
 
 --2 crie uma store procedure chamada proc_copiatbl que cria uma copia da tabela tbl_cidades toda vez que for executada;
-CREATE OR REPLACE PROCEDURE proc_copiatbl()
-LANGUAGE SQL
-AS
-$$
-CREATE TABLE IF NOT EXISTS tbl_cidades_copia AS
-SELECT * FROM tbl_cidades;
-$$;
+
+CREATE or replace PROCEDURE proc_copiatbl()
+language plpgsql AS $$
+BEGIN
+DROP TABLE IF EXISTS tbl_cidades_copia;
+CREATE TABLE tbl_cidades_copia 
+as SELECT * FROM tbl_cidades;
+END $$;
 
 
 --3 crie uma store procedure chamada proc_novoprojeto que adiciona um novo projeto na tabela tbl_projetos
 --recebe como parametros o nome do projeto e o codigo do departamento
-CREATE OR REPLACE PROCEDURE proc_novoprojeto(
-    IN p_nome_projeto TEXT,
-    IN p_cod_departamento INT
-)
-LANGUAGE SQL
-AS
-$$
-INSERT INTO tbl_projetos (nome, cod_departamento)
-VALUES (p_nome_projeto, p_cod_departamento);
-$$;
 
+CREATE or replace PROCEDURE proc_novoprojeto(nome_proj text, cod_dep int)
+language plpgsql AS $$
+BEGIN
+INSERT INTO tbl_projetos(nome, cod_departamento) VALUES (nome_proj, cod_dep);
+COMMIT;
+END $$;
 
 --4 crie uma store procedure chamada proc_delprojeto que deleta um projeto da tbl_projetos
 -- recebe como parametro o codigo do projeto
-CREATE OR REPLACE PROCEDURE proc_delprojeto(
-    IN p_cod_projeto INT
-)
-LANGUAGE SQL
-AS
-$$
-DELETE FROM tbl_projetos
-WHERE cod_projeto = p_cod_projeto;
-$$;
+
+CREATE PROCEDURE proc_delprojeto(codigo int) 
+language plpgsql AS $$
+BEGIN
+	DELETE FROM tbl_projetos WHERE cod_projeto = codigo;
+	COMMIT;
+END $$ ;
 
 
 --5 crie uma store procedure chamada proc_projeto_arquivado que recebe o codigo de um projeto.
 --a procedure devera criar uma tabela chamada tbl_projetos_arquivados, caso ela nao exista. tabela deve ter 2 colunas: codigo_projeto e nome.
 --a procedure deve salvar o projeto do codigo recebido na tbl_projetos_arquivados e deleta-la da tabela tbl_projetos.
-CREATE OR REPLACE PROCEDURE proc_projeto_arquivado(
-    IN p_cod_projeto INT
-)
-LANGUAGE SQL
-AS
-$$
+
+CREATE PROCEDURE proc_projeto_arquivado(codigo int) 
+language plpgsql AS $$
 BEGIN
-    -- Verifica se a tabela tbl_projetos_arquivados existe, se não, cria.
-    IF NOT EXISTS (SELECT 1 FROM information_schema.tables WHERE table_name = 'tbl_projetos_arquivados') THEN
-        CREATE TABLE tbl_projetos_arquivados (
-            codigo_projeto INT,
-            nome TEXT
-        );
-    END IF;
-
-    -- Insere o projeto arquivado na tabela tbl_projetos_arquivados.
-    INSERT INTO tbl_projetos_arquivados (codigo_projeto, nome)
-    SELECT cod_projeto, nome
-    FROM tbl_projetos
-    WHERE cod_projeto = p_cod_projeto;
-
-    -- Remove o projeto da tabela tbl_projetos.
-    DELETE FROM tbl_projetos
-    WHERE cod_projeto = p_cod_projeto;
-END;
-$$;
+	CREATE TABLE IF NOT EXISTS tbl_projetos_arquivados (cod_projeto int, nome text);
+	INSERT INTO tbl_projetos_arquivados
+	SELECT cod_projeto, nome FROM tbl_projetos where cod_projeto=codigo;
+	DELETE FROM tbl_projetos WHERE cod_projeto = codigo;
+	COMMIT;
+END $$ ;
