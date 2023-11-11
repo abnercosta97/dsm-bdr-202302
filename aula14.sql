@@ -207,6 +207,21 @@ FOR EACH ROW
 EXECUTE FUNCTION fc_atualizar();
 --2 crie uma trigger que atualiza a quantidade de projetos da tbl_departamentos caso um novo projeto for adicionado
 
+CREATE OR REPLACE FUNCTION fc_atualizar2()
+RETURNS TRIGGER
+language plpgsql AS
+$$
+BEGIN
+
+update tbl_departamentos set qtde_projetos = qtde_projetos + 1 where cod_departamento = NEW.cod_departamento;   
+RETURN NEW;
+END
+$$ ;
+CREATE OR REPLACE TRIGGER tr_atualizar_projeto2
+AFTER INSERT ON tbl_projetos
+FOR EACH ROW
+EXECUTE FUNCTION fc_atualizar2();
+
 
 --3 a) Crie uma tabela chamada tbl_empregado_historico_salario com as colunas cod_empregado e salario e data
 --  b) crie uma trigger que salva o salario atual de um empregado toda vez que seu salario for atualizado
